@@ -20,7 +20,7 @@ result.merged <- data.frame(answer=test.class, predict=result)
 hit <- apply(result.merged, 1, function(x){ifelse(x[1] == x[2], 1, 0)})
 table(hit) / length(hit)
 
-data.index <- seq(1, nrow(data), 0.05 * nrow(data))
+data.index <- seq(1, nrow(data), 0.01 * nrow(data))
 test.samples <- (tail(data.index)+1):nrow(data)
 test <- data[test.samples, -1]
 test.class <- data[test.samples, 1]
@@ -37,4 +37,13 @@ for (i in 2:length(data.index)) {
 }
 
 results.mx <- matrix(results, nrow=length(result))
-#apply(results.mx, 1, function(x){})
+most_occur <- function(x) {
+  .tbl <- table(x)
+  .idx <- which(.tbl == max(.tbl))[1]
+  return(as.integer(names(.tbl[.idx])))
+}
+result.amsamble <- apply(results.mx, 1, most_occur)
+result.amsamble.labeled <- levels(data[, 1])[result.amsamble]
+result.merged <- data.frame(answer=test.class, predict=result.amsamble.labeled)
+hit <- apply(result.merged, 1, function(x){ifelse(x[1] == x[2], 1, 0)})
+print(table(hit) / length(hit))
